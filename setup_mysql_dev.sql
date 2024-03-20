@@ -1,3 +1,5 @@
+-- Script to create the database, user, and privileges
+
 -- Create database if not exists
 CREATE DATABASE IF NOT EXISTS hbnb_dev_db;
 -- Create user if not exists
