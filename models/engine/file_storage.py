@@ -52,11 +52,11 @@ class FileStorage:
     def all(self, cls=None):
         """Returns a list of objects of cls type"""
         if cls is None:
-            return list(FileStorage.__objects.values())
-        objectsofcls = []
-        for obj in FileStorage.__objects.values():
+            return FileStorage.__objects
+        objectsofcls = {}
+        for key, obj in FileStorage.__objects.items():
             if isinstance(obj, cls):
-                objectsofcls.append(obj)
+                objectsofcls[key] = obj
         return objectsofcls
 
     def delete(self, obj=None):
