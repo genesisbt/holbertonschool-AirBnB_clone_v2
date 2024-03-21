@@ -11,6 +11,7 @@ from models.amenity import Amenity
 from models.place import Place
 from models.review import Review
 
+
 class DBStorage:
     __engine = None
     __session = None
@@ -31,7 +32,7 @@ class DBStorage:
                 key = f"{obj.__class__.__name__}.{obj.id}"
                 objects[key] = obj
         return objects
-    
+
     def new(self, obj):
         """Add object to current db session."""
         if obj:
