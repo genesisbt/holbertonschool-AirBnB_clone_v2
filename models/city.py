@@ -21,3 +21,5 @@ class City(BaseModel, Base):
                 if element.state_id == self.id:
                     Citylist.append(element)
         return [Citylist]
+    
+Base.metadata.create_all(engine)
