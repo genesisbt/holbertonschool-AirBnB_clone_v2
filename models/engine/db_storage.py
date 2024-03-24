@@ -19,8 +19,15 @@ class DBStorage:
 
     def __init__(self):
         self.__engine = create_engine('mysql+mysqldb://{}:{}@{}/{}'.format(getenv('HBNB_MYSQL_USER'), getenv('HBNB_MYSQL_PWD'), getenv('HBNB_MYSQL_HOST'), pool_pre_ping=True))
+        
+        Session = sessionmaker(bind=self.__engine)
+        self.__session = Session()
+
+        
         if getenv('HBNB_ENV') == 'test':
             Base.metadata.drop_all(self.__engine)
+
+        Base.metadata.create_all(self.__engine)
 
     def all(self, cls=None):
         """Query objects from the database session by the class name."""
