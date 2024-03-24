@@ -11,16 +11,5 @@ class City(BaseModel, Base):
 
     state_id = Column(String(60), nullable=False, ForeignKey=("states.id"))
 
-    @property
-    def cities(self):
-        """Getter attribute to return cities associated with this state"""
-        from models import storage
-        from models.city import City
-        Citylist = []
-        for element in storage.all():
-            if isinstance(element, City):
-                if element.state_id == self.id:
-                    Citylist.append(element)
-        return [Citylist]
 
 
