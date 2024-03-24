@@ -9,7 +9,7 @@ class City(BaseModel, Base):
     __tablename__ = "cities"
     name = Column(String(128), nullable=False)
 
-    state_id = Column(String(60), nullable=False, ForeignKey="states.id")
+    state_id = Column(String(60), nullable=False, ForeignKey=("states.id"))
 
     @property
     def cities(self):
@@ -23,5 +23,4 @@ class City(BaseModel, Base):
                     Citylist.append(element)
         return [Citylist]
 
-Base.metadata.create_all(engine)
 
