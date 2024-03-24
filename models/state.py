@@ -3,6 +3,7 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import *
 from models import storage
+from models.city import City
 
 
 class State(BaseModel, Base):
@@ -13,8 +14,6 @@ class State(BaseModel, Base):
     @property
     def cities(self):
         """Getter attribute to return cities associated with this state"""
-        from models import storage
-        from models.city import City
         Citylist = []
         for element in storage.all():
             if isinstance(element, City):
