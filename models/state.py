@@ -2,10 +2,12 @@
 """ State Module for HBNB project """
 from models.base_model import BaseModel, Base
 from sqlalchemy import *
+from models import storage
 
 
 class State(BaseModel, Base):
     """ State class """
     __tablename__ = "states"
     name = Column(String(128), nullable=False)
-Base.metadata.create_all(engine)
+    storage.reload
+    
