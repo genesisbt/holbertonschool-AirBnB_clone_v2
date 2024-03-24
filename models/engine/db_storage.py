@@ -22,7 +22,6 @@ class DBStorage:
 
     def all(self, cls=None):
         """Query objects from the database session by the class name."""
-
         objects = {}
         classes = [cls] if cls else [BaseModel, User, State, City, Amenity, Place, Review]
         for cls in classes:
