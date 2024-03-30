@@ -2,19 +2,18 @@
 """ Console Module """
 import cmd
 import sys
-from models.base_model import BaseModel, Base
-from models import storage
-from models.user import User
-from models.place import Place
-from models.state import State
-from models.city import City
-from models.amenity import Amenity
-from models.review import Review
+
 
 
 class HBNBCommand(cmd.Cmd):
     """ Contains the functionality for the HBNB console"""
-
+    from models.base_model import BaseModel
+    from models.user import User
+    from models.place import Place
+    from models.state import State
+    from models.city import City
+    from models.amenity import Amenity
+    from models.review import Review
     # determines prompt for interactive/non-interactive modes
     prompt = '(hbnb) ' if sys.__stdin__.isatty() else ''
 
@@ -113,27 +112,25 @@ class HBNBCommand(cmd.Cmd):
         """ Overrides the emptyline method of CMD """
         pass
 
-    def do_create(self, arg):
-        """ Create an object of any class"""
-
-        args = arg.split(" ")
-        if len(args) < 2:
+    def do_create(self, args):
+        from models.__init__ import storage
+        args_list = args.split()
+    
+        if len(args_list) < 2:
             print("** class name missing **")
             return
-
-        classname = args[1]
-        if classname not in HBNBCommand.classes:
+        class_name = args_list[1]
+        if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-
-        attributs = {}
-        for key_value in args[2:]:
-            k, v = key_value.split("=")
-            v = v.replace('_', ' ')
-            attributs[k] = v.strip('"\'')
-
-        new_instance = HBNBCommand.classes[classname](**attributs)
-        new_instance.save()
+        
+        tocreate = {}
+        for parameter in args_list[2:]:
+            key, value = parameter.split("=")
+            tocreate[key] = value.replace('_', ' ').strip('"\'')
+            
+        new_instance = HBNBCommand.classes[class_name](**tocreate)
+        storage.save()
         print(new_instance.id)
 
     def help_create(self):
@@ -143,6 +140,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_show(self, args):
         """ Method to show an individual object """
+        from models.__init__ import storage
         new = args.partition(" ")
         c_name = new[0]
         c_id = new[2]
@@ -176,6 +174,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_destroy(self, args):
         """ Destroys a specified object """
+        from models.__init__ import storage
         new = args.partition(" ")
         c_name = new[0]
         c_id = new[2]
@@ -197,7 +196,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del storage.all()[key]
+            del(storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -209,6 +208,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
+        from models.__init__ import storage
         print_list = []
 
         if args:
@@ -231,6 +231,7 @@ class HBNBCommand(cmd.Cmd):
         print("[Usage]: all <className>\n")
 
     def do_count(self, args):
+        from models.__init__ import storage
         """Count current number of class instances"""
         count = 0
         for k, v in storage._FileStorage__objects.items():
@@ -239,11 +240,12 @@ class HBNBCommand(cmd.Cmd):
         print(count)
 
     def help_count(self):
-        """Method to count number of instances of a class"""
+        """ """
         print("Usage: count <class_name>")
 
     def do_update(self, args):
         """ Updates a certain object with new info """
+        from models.__init__ import storage
         c_name = c_id = att_name = att_val = kwargs = ''
 
         # isolate cls from id/args, ex: (<cls>, delim, <id/args>)
@@ -310,24 +312,25 @@ class HBNBCommand(cmd.Cmd):
             # block only runs on even iterations
             if (i % 2 == 0):
                 att_val = args[i + 1]  # following item is value
-            if not att_name:  # check for att_name
-                print("** attribute name missing **")
-                return
-            if not att_val:  # check for att_value
-                print("** value missing **")
-                return
-            # type cast as necessary
-            if att_name in HBNBCommand.types:
-                att_val = HBNBCommand.types[att_name](att_val)
-            # update dictionary with name, value pair
-            new_dict.__dict__.update({att_name: att_val})
+                if not att_name:  # check for att_name
+                    print("** attribute name missing **")
+                    return
+                if not att_val:  # check for att_value
+                    print("** value missing **")
+                    return
+                # type cast as necessary
+                if att_name in HBNBCommand.types:
+                    att_val = HBNBCommand.types[att_name](att_val)
+
+                # update dictionary with name, value pair
+                new_dict.__dict__.update({att_name: att_val})
+
         new_dict.save()  # save updates to file
 
     def help_update(self):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
-
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
