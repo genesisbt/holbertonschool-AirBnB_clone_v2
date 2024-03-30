@@ -17,28 +17,7 @@ class DBStorage:
     __engine = None
     __session = None
 
-    def __init__(self):
-        user = os.environ.get("HBNB_MYSQL_USER")
-        password = os.environ.get("HBNB_MYSQL_PWD")
-        host = os.environ.get("HBNB_MYSQL_HOST")
-        database = os.environ.get("HBNB_MYSQL_DB")
-        env = os.environ.get("HBNB_ENV")
-        print("Connecting to MySQL database...")
-        print(f"User: {user}, Host: {host}, Database: {database}")
-        self.__engine = create_engine("mysql+mysqldb://{}:{}@{}:3306/{}".
-                                      format(user, password, host, database),
-                                      pool_pre_ping=True)
 
-        Session = sessionmaker(bind=self.__engine)
-        Session.configure(bind=self.__engine)
-        self.__session = Session()
-
-        if env == "test":
-            print("Dropping existing tables...")
-            Base.metadata.drop_all(self.__engine)
-        print("Creating tables...")
-        Base.metadata.create_all(self.__engine)
-        print("Initialization completed.")
 
     def all(self, cls=None):
         """Query objects from the database session by the class name."""
