@@ -116,9 +116,9 @@ class HBNBCommand(cmd.Cmd):
         from models.__init__ import storage
         args_list = args.split()
     
-        if not args_list[1]:
+        if len(args_list) < 2:
             print("** class name missing **")
-            return
+        return
         class_name = args_list[1]
         if class_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
