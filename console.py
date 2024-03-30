@@ -3,7 +3,7 @@
 import cmd
 import sys
 from models.base_model import BaseModel
-from models.__init__ import storage
+
 from models.user import User
 from models.place import Place
 from models.state import State
@@ -114,7 +114,7 @@ class HBNBCommand(cmd.Cmd):
         pass
 
     def do_create(self, args):
-
+        from models.__init__ import storage
         args_list = args.split()
     
         if not args_list[1]:
@@ -174,6 +174,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_destroy(self, args):
         """ Destroys a specified object """
+        from models.__init__ import storage
         new = args.partition(" ")
         c_name = new[0]
         c_id = new[2]
@@ -207,6 +208,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_all(self, args):
         """ Shows all objects, or all objects of a class"""
+        from models.__init__ import storage
         print_list = []
 
         if args:
@@ -229,6 +231,7 @@ class HBNBCommand(cmd.Cmd):
         print("[Usage]: all <className>\n")
 
     def do_count(self, args):
+        from models.__init__ import storage
         """Count current number of class instances"""
         count = 0
         for k, v in storage._FileStorage__objects.items():
@@ -242,6 +245,7 @@ class HBNBCommand(cmd.Cmd):
 
     def do_update(self, args):
         """ Updates a certain object with new info """
+        from models.__init__ import storage
         c_name = c_id = att_name = att_val = kwargs = ''
 
         # isolate cls from id/args, ex: (<cls>, delim, <id/args>)
