@@ -10,10 +10,12 @@ class FileStorage:
 
     def new(self, obj):
         """Adds new object to storage dictionary"""
+        print(self.__class__.__name__ + " " + __name__ )
         self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
 
     def save(self):
         """Saves storage dictionary to file"""
+        print(self.__class__.__name__ + " " + __name__ )
         with open(FileStorage.__file_path, 'w') as f:
             temp = {}
             temp.update(FileStorage.__objects)
@@ -22,6 +24,7 @@ class FileStorage:
             json.dump(temp, f)
 
     def reload(self):
+        print(self.__class__.__name__ + " " + __name__ )
         """Loads storage dictionary from file"""
         from models.base_model import BaseModel
         from models.user import User
@@ -47,6 +50,7 @@ class FileStorage:
 
     def all(self, cls=None):
         """Returns a list of objects of cls type"""
+        print(self.__class__.__name__ + " " + __name__ )
         if cls is None:
             return FileStorage.__objects
         objectsofcls = {}
@@ -56,6 +60,7 @@ class FileStorage:
         return objectsofcls
 
     def delete(self, obj=None):
+        print(self.__class__.__name__ + " " + __name__ )
         """Deletes obj from __objects if it exists"""
         if obj is not None:
             key = obj.__class__.__name__ + '.' + obj.id
