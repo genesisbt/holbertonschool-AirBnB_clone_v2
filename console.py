@@ -130,7 +130,7 @@ class HBNBCommand(cmd.Cmd):
             key, value = parameter.split("=")
             tocreate[key] = value.replace('_', ' ').strip('"\'')
             
-        new_instance = HBNBCommand.classes[class_name](**to_create)
+        new_instance = HBNBCommand.classes[class_name](**tocreate)
         storage.save()
         print(new_instance.id)
 
