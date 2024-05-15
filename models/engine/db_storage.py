@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" DBStorage Module """
+""" DBStorage Module"""
 import os
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -40,6 +40,17 @@ class DBStorage:
 
         return object_dict
 
+
+    def new(self, obj):
+        self.__session.add(obj)
+
+    def save(self):
+        self.__session.commit()
+
+    def delete(self, obj=None):
+        if obj:
+            self.__session.delete(obj)
+
     def reload(self):
         from models.base_model import BaseModel
         from models.user import User
@@ -55,14 +66,3 @@ class DBStorage:
     def close(self):
         self.reload()
         self.__session.close()
-
-    def new(self, obj):
-        self.__session.add(obj)
-
-    def save(self):
-        self.__session.commit()
-
-    def delete(self, obj=None):
-        if obj:
-            self.__session.delete(obj)
-            
