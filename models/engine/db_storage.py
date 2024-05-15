@@ -1,52 +1,68 @@
 #!/usr/bin/python3
-from sqlalchemy import *
-from sqlalchemy.orm import *
-from os import getenv
+""" DBStorage Module """
 import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models.base_model import Base
 
 
 class DBStorage:
     __engine = None
     __session = None
 
+    def __init__(self):
+        user = os.getenv('HBNB_MYSQL_USER', 'hbnb_dev')
+        pwd = os.getenv('HBNB_MYSQL_PWD', 'hbnb_dev_db')
+        host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
+        db = os.getenv('HBNB_MYSQL_DB', 'hbnb_dev')
+        self.__engine = create_engine(f'mysql+mysqldb://{user}:{pwd}@{host}/{db}',
+                                      pool_pre_ping=True)
 
+        if os.getenv('HBNB_ENV') == 'test':
+            Base.metadata.drop_all(self.__engine)
+        Base.metadata.create_all(self.__engine)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = session_factory()
 
     def all(self, cls=None):
-        """Query objects from the database session by the class name."""
+        object_dict = {}
+        
+        if cls is None:
+            for class_key in self.all_classes:
+                class_obj = eval(class_key)
+                for instance in self.__session.query(class_obj).all():
+                    instance_key = f"{instance.__class__.__name__}.{instance.id}"
+                    object_dict[instance_key] = instance
+        else:
+            for instance in self.__session.query(cls).all():
+                instance_key = f"{instance.__class__.__name__}.{instance.id}"
+                object_dict[instance_key] = instance
+
+        return object_dict
+
+    def reload(self):
         from models.base_model import BaseModel
         from models.user import User
-        from models.state import State
-        from models.city import City
-        from models.amenity import Amenity
         from models.place import Place
+        from models.city import City
+        from models.state import State
+        from models.amenity import Amenity
         from models.review import Review
-        objects = {}
-        classes = [cls] if cls else [BaseModel, User, State, City, Amenity, Place, Review]
-        for cls in classes:
-            query_result = self.__session.query(cls).all()
-            for obj in query_result:
-                key = f"{obj.__class__.__name__}.{obj.id}"
-                objects[key] = obj
-        return objects
-    
+        Base.metadata.create_all(self.__engine)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = session_factory()
+        
+    def close(self):
+        self.reload()
+        self.__session.close()
+
     def new(self, obj):
-        """Add object to current db session."""
-        if obj:
-            self.__session.add(obj)
+        self.__session.add(obj)
 
     def save(self):
-        """Commit changes of current db session."""
         self.__session.commit()
 
     def delete(self, obj=None):
-        """Delete obj from current db session"""
         if obj:
             self.__session.delete(obj)
-            self.__session.commit()
-
-    def reload(self):
-        """Reloads the database state."""
-        from models.base_model import Base
-        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
-        self.__session = scoped_session(session_factory)
-        Base.metadata.create_all(self.__engine)
+            
