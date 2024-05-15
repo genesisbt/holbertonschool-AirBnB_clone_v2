@@ -1,65 +1,68 @@
 #!/usr/bin/python3
-"""file storage module"""
-import json
+""" DBStorage Module for HBNB project """
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from models.base_model import Base
 
 
-class FileStorage:
-    __file_path = 'file.json'
-    __objects = {}
+class DBStorage:
+    __engine = None
+    __session = None
+
+    def __init__(self):
+        user = os.getenv('HBNB_MYSQL_USER', 'hbnb_dev')
+        pwd = os.getenv('HBNB_MYSQL_PWD', 'hbnb_dev_db')
+        host = os.getenv('HBNB_MYSQL_HOST', 'localhost')
+        db = os.getenv('HBNB_MYSQL_DB', 'hbnb_dev')
+        self.__engine = create_engine(f'mysql+mysqldb://{user}:{pwd}@{host}/{db}',
+                                      pool_pre_ping=True)
+
+        if os.getenv('HBNB_ENV') == 'test':
+            Base.metadata.drop_all(self.__engine)
+        Base.metadata.create_all(self.__engine)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = session_factory()
 
     def all(self, cls=None):
+        object_dict = {}
+        
         if cls is None:
-            return self.__objects
+            for class_key in self.all_classes:
+                class_obj = eval(class_key)
+                for instance in self.__session.query(class_obj).all():
+                    instance_key = f"{instance.__class__.__name__}.{instance.id}"
+                    object_dict[instance_key] = instance
         else:
-            new_dict = {}
-            for key, obj in self.__objects.items():
-                if isinstance(obj, cls):
-                    new_dict[key] = obj
-            return new_dict
+            for instance in self.__session.query(cls).all():
+                instance_key = f"{instance.__class__.__name__}.{instance.id}"
+                object_dict[instance_key] = instance
+
+        return object_dict
+
 
     def new(self, obj):
-        self.all().update({obj.to_dict()['__class__'] + '.' + obj.id: obj})
+        self.__session.add(obj)
 
     def save(self):
-        with open(FileStorage.__file_path, 'w') as f:
-            temp = {}
-            temp.update(FileStorage.__objects)
-            for key, val in temp.items():
-                temp[key] = val.to_dict()
-            json.dump(temp, f)
+        self.__session.commit()
+
+    def delete(self, obj=None):
+        if obj:
+            self.__session.delete(obj)
 
     def reload(self):
         from models.base_model import BaseModel
         from models.user import User
         from models.place import Place
-        from models.state import State
         from models.city import City
+        from models.state import State
         from models.amenity import Amenity
         from models.review import Review
-
-        classes = {
-                    'BaseModel': BaseModel, 'User': User, 'Place': Place,
-                    'State': State, 'City': City, 'Amenity': Amenity,
-                    'Review': Review
-                  }
-        try:
-            temp = {}
-            with open(FileStorage.__file_path, 'r') as f:
-                temp = json.load(f)
-                for key, value in temp.items():
-                    class_name = value.pop("__class__")
-                    self.all()[key] = classes[class_name](**value)
-        except FileNotFoundError:
-            pass
-            
+        Base.metadata.create_all(self.__engine)
+        session_factory = sessionmaker(bind=self.__engine, expire_on_commit=False)
+        self.__session = session_factory()
+        
     def close(self):
         self.reload()
-
-    def delete(self, obj=None):
-        if obj is None:
-            return
-        
-        key = obj.__class__.__name__ + '.' + str(obj.id)
-
-        if key in self.__objects:
-            del self.__objects[key]
+        self.__session.close()
