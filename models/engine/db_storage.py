@@ -12,7 +12,6 @@ import os
 
 
 class DBStorage:
-    """This class manages storage of hbnb models in a SQL database"""
     __engine = None
     __session = None
 
@@ -34,7 +33,6 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def new(self, obj):
-        """Adds new object to storage database"""
         if obj is not None:
             try:
                 self.__session.add(obj)
@@ -45,11 +43,9 @@ class DBStorage:
                 raise ex
 
     def save(self):
-        """save method"""
         self.__session.commit()
 
     def delete(self, obj=None):
-        """Removes an object from the storage database"""
         if obj is not None:
             self.__session.query(type(obj)).filter(
                 type(obj).id == obj.id).delete(
@@ -57,7 +53,6 @@ class DBStorage:
             )
 
     def reload(self):
-        """Loads storage database"""
         Base.metadata.create_all(self.__engine)
         SessionFactory = sessionmaker(
             bind=self.__engine,
@@ -66,5 +61,4 @@ class DBStorage:
         self.__session = scoped_session(SessionFactory)()
 
     def close(self):
-        """Method to call close() on the class Session"""
         self.__session.close()
