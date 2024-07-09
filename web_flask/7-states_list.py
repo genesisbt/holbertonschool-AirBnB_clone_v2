@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """ Flask """
 
 from flask import Flask, render_template
