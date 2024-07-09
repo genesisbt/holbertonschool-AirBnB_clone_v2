@@ -1,5 +1,8 @@
 #!/usr/bin/python3
-""" 5 number template """
+"""
+A simple Flask application demonstrating various routing capabilities.
+"""
+
 from flask import Flask, render_template
 from werkzeug.utils import escape
 app = Flask(__name__, strict_slashes=False)
