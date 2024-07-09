@@ -1,4 +1,5 @@
-from flask import Flask, escape, render_template
+from flask import Flask, render_template
+from werkzeug.utils import escape
 
 app = Flask(__name__, strict_slashes=False)
 
@@ -27,7 +28,8 @@ def number(n):
 
 @app.route('/number_template/<int:n>')
 def number_template(n):
-    return render_template('number.html', n=n)
+    escaped_n = escape(str(n))
+    return render_template('number.html', n=escaped_n)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
