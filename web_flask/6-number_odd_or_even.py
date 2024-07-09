@@ -1,52 +1,58 @@
 #!/usr/bin/python3
-"""Script that starts a Flask web application"""
+"""Had to use werzeug utils cause it wasnt in the flask import cause the flask version"""
 from flask import Flask, render_template
+from werkzeug.utils import escape
+
+app = Flask(__name__)
 
 
-wapp = Flask(__name__)
+@app.route('/', strict_slashes=False)
+def hello():
+    return ("Hello HBNB!")
 
 
-@wapp.route('/', strict_slashes=False)
-def greetings():
-    return "Hello HBNB!"
+@app.route("/hbnb", strict_slashes=False)
+def hbnb_hbnb():
+    return ("HBNB")
 
 
-@wapp.route('/hbnb', strict_slashes=False)
-def greet_hbnb():
-    return "HBNB"
-
-
-@wapp.route('/c/<text>', strict_slashes=False)
-def c_route(text):
-    text = text.replace('_', ' ')
+@app.route("/c/<text>", strict_slashes=False)
+def hbnb_c(text):
+    text = escape(text).replace('_', ' ')
     return ("C {}".format(text))
 
 
-@wapp.route('/python/', defaults={'text': 'is cool'}, strict_slashes=False)
-@wapp.route('/python/<text>', strict_slashes=False)
-def py_route(text):
-    text = text.replace('_', ' ')
+@app.route("/python/<text>", strict_slashes=False)
+@app.route("/python/", defaults={"text": "is cool"}, strict_slashes=False)
+def hbnb_python(text):
+    text = escape(text).replace('_', ' ')
     return ("Python {}".format(text))
 
 
-@wapp.route('/number/<int:n>', strict_slashes=False)
-def n_route(n):
+@app.route("/number/<int:n>", strict_slashes=False)
+def hbnb_number(n):
     return ("{} is a number".format(n))
 
 
-@wapp.route('/number_template/<int:n>', strict_slashes=False)
-def n_template(n):
-    return (render_template('5-number.html', n=n))
-
-
-@wapp.route('/number_odd_or_even/<int:n>', strict_slashes=False)
-def n_odd_even(n):
-    if n % 2 == 0:
-        od_ev = 'even'
+@app.route("/number_template/<int:n>", strict_slashes=False)
+def number_template(n):
+    if isinstance(n, int):
+        return (render_template("5-number.html", num=n))
     else:
-        od_ev = 'odd'
-    return (render_template('6-number_odd_or_even.html', n=n, od_ev=od_ev))
+        return ("Not found", 404)
 
 
-if __name__ == "__main__":
-    wapp.run(host='0.0.0.0', port=5000)
+@app.route("/number_odd_or_even/<int:n>", strict_slashes=False)
+def number_odd_or_even(n):
+    if isinstance(n, int):
+        if n % 2 == 0:
+            odev = "even"
+        else:
+            odev = "odd"
+        return (render_template("6-number_odd_or_even.html", num=n, odev=odev))
+    else:
+        return ("Not found", 404)
+
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=5000)
