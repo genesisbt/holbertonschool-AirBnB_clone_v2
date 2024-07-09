@@ -1,36 +1,33 @@
-#!/usr/bin/python3
-"""Script"""
-from flask import Flask, render_template
+from flask import Flask, escape, render_template
 
-wapp = Flask(__name__)
+app = Flask(__name__, strict_slashes=False)
 
-@wapp.route('/', strict_slashes=False)
-def greetings():
+@app.route('/', defaults={'text': ''})
+@app.route('/<text>')
+def home(text):
     return "Hello HBNB!"
 
-@wapp.route('/hbnb', strict_slashes=False)
-def greet_hbnb():
+@app.route('/hbnb')
+def hbnb():
     return "HBNB"
 
-@wapp.route('/c/<text>', strict_slashes=False)
+@app.route('/c/<text>')
 def c_route(text):
     text = text.replace('_', ' ')
-    return ("C {}".format(text))
+    return f"C {text}"
 
-@wapp.route('/python/', defaults={'text': 'is cool'}, strict_slashes=False)
-@wapp.route('/python/<text>', strict_slashes=False)
-def py_route(text):
+@app.route('/python/<text>')
+def python_route(text):
     text = text.replace('_', ' ')
-    return ("Python {}".format(text))
+    return f"Python {text}"
 
-@wapp.route('/number/<int:n>', strict_slashes=False)
-def n_route(n):
-    return ("{} is a number".format(n))
+@app.route('/number/<int:n>')
+def number(n):
+    return f"{n} is a number"
 
-@wapp.route('/number_template/<int:n>', strict_slashes=False)
-def n_template(n):
-    print(f"Rendering template for number: {n}")
-    return render_template('5-number.html', n=n)
+@app.route('/number_template/<int:n>')
+def number_template(n):
+    return render_template('number.html', n=n)
 
-if __name__ == "__main__":
-    wapp.run(host='0.0.0.0', port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
