@@ -1,32 +1,31 @@
-#!/usr/bin/python3
 from flask import Flask, render_template
 
 app = Flask(__name__)
 
-@app.route('/', strict_slashes=False)
+@app.route('/')
 def hello():
     return "Hello HBNB!"
 
-@app.route("/hbnb", strict_slashes=False)
+@app.route('/hbnb')
 def hbnb():
     return "HBNB"
 
-@app.route("/c/<text>", strict_slashes=False)
+@app.route('/c/<text>')
 def c_text(text):
     text = text.replace('_', ' ')
-    return "C {}".format(text)
+    return f"C {text}"
 
-@app.route("/python/", defaults={"text": "is cool"}, strict_slashes=False)
-@app.route("/python/<text>", strict_slashes=False)
-def python_text(text):
+@app.route('/python/')
+@app.route('/python/<text>')
+def python_text(text="is cool"):
     text = text.replace('_', ' ')
-    return "Python {}".format(text)
+    return f"Python {text}"
 
-@app.route("/number/<int:n>", strict_slashes=False)
+@app.route('/number/<int:n>')
 def number(n):
-    return "{} is a number".format(n)
+    return f"{n} is a number"
 
-@app.route("/number_template/<int:n>", strict_slashes=False)
+@app.route('/number_template/<int:n>')
 def number_template(n):
     return render_template("5-number.html", number=n)
 
